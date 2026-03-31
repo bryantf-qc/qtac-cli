@@ -15,7 +15,13 @@ Required additional libraries:
 1. Qt Multimedia
 2. Qt Serial Port
 
-![Qt installation](../resources/qtac-additional-dependencies.png)
+![Qt additional dependencies](../resources/qtac-additional-dependencies.png)
+
+### Setup CMake
+QTAC requires CMake for building from source. You can either install CMake separately or use the Qt installer to setup CMake.
+Review the following screenshot to setup CMake on your system.
+
+![Qt CMake dependencies](../resources/qtac-cmake-install.png)
 
 ## Clone repository
 Use the below command to clone the project source:
