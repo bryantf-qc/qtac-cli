@@ -8,11 +8,14 @@ Creator. If you're performing a fresh install, use the [Qt Online Installer](htt
 ## Configure Qt installation
 QTAC requires Qt6 and MSVC2022 64-bit. Please review below custom install configuration in Qt to optimize download time.
 
+![Qt installation](../resources/qt-install-config.png)
+
+
 Required additional libraries:
-1. Qt Serial Bus
+1. Qt Multimedia
 2. Qt Serial Port
 
-![Qt installation](../resources/qt-install-config.png)
+![Qt installation](../resources/qtac-additional-dependencies.png)
 
 ## Clone repository
 Use the below command to clone the project source:
