@@ -144,15 +144,15 @@ Execute `build.sh` to generate executables:
 ```
 
 **Build output**:
-- Debug: `__Builds/x64/Debug`
-- Release: `__Builds/x64/Release`
+- Debug: `__Builds/Linux/Debug`
+- Release: `__Builds/Linux/Release`
 
 > [!NOTE]
 > Ensure that [make](https://www.gnu.org/software/make/) is available in your environment before building.
 
 **Usage**:
 ```bash
-./__Builds/x64/Release/QTAC
+./__Builds/Linux/Release/QTAC
 ```
 
 ## Repository Structure
