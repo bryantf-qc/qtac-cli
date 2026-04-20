@@ -121,8 +121,11 @@ if(WIN32)
     set_target_properties(ftd2xx_release PROPERTIES IMPORTED_LOCATION "${RELEASE_LIB}")
 else()
     add_library(ftd2xx STATIC IMPORTED GLOBAL)
-    set_target_properties(ftd2xx PROPERTIES IMPORTED_LOCATION "${DEBUG_LIB}")
-    set_target_properties(ftd2xx PROPERTIES IMPORTED_LOCATION "${RELEASE_LIB}")
+    set_target_properties(ftd2xx PROPERTIES
+        IMPORTED_LOCATION_DEBUG   "${DEBUG_LIB}"
+        IMPORTED_LOCATION_RELEASE "${RELEASE_LIB}"
+        IMPORTED_LOCATION         "${RELEASE_LIB}"
+    )
 endif()
 
 if(WIN32 AND DEFINED ENV{QTDIR})
