@@ -128,9 +128,10 @@ __Builds\x64\Release\QTAC.exe
    ```
 2. **Runtime Dependencies**:
    ```bash
-   sudo apt install libxcb-cursor0 libpcre2-16-0 libxkbcommon-x11-0 libxcb-xkb1 libxcb-icccm4 libxcb-shape0 libxcb-keysyms1 libgl1 libegl-dev libxcb-xinerama0 libpulse-dev
+   sudo cp udev-rules/99-QTAC-USB.rules /etc/udev/rules.d/
+   sudo udevadm control --reload
    ```
-3. **Environment Variable**:
+4. **Environment Variable**:
    ```bash
    export QTBIN=/path/to/Qt/directory/<version>/gcc_64/bin
    ```

@@ -1,0 +1,21 @@
+# Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+# SPDX-License-Identifier: BSD-3-Clause
+
+# Rules for the new series FTDI debug board
+ATTRS{idVendor}=="0403", ATTRS{idProduct}=="1998", MODE:="666", PROGRAM="/bin/sh -c 'echo -n $id:1.2 > /sys/bus/usb/drivers/ftdi_sio/unbind'"
+ATTRS{idVendor}=="0403", ATTRS{idProduct}=="1998", MODE:="666", PROGRAM="/bin/sh -c 'echo -n $id:1.3 > /sys/bus/usb/drivers/ftdi_sio/unbind'"
+
+# Rules for the existing FTDI debug boards
+ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6011", MODE:="666", PROGRAM="/bin/sh -c 'echo -n $id:1.2 > /sys/bus/usb/drivers/ftdi_sio/unbind'"
+ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6011", MODE:="666", PROGRAM="/bin/sh -c 'echo -n $id:1.3 > /sys/bus/usb/drivers/ftdi_sio/unbind'"
+
+# Rules for all GoWin debug boards
+ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", MODE:="666", PROGRAM="/bin/sh -c 'echo -n $id:1.2 > /sys/bus/usb/drivers/ftdi_sio/unbind'"
+ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", MODE:="666", PROGRAM="/bin/sh -c 'echo -n $id:1.3 > /sys/bus/usb/drivers/ftdi_sio/unbind'"
+
+ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6010", MODE:="666", PROGRAM="/bin/sh -c 'echo -n $id:1.2 > /sys/bus/usb/drivers/ftdi_sio/unbind'"
+ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6010", MODE:="666", PROGRAM="/bin/sh -c 'echo -n $id:1.3 > /sys/bus/usb/drivers/ftdi_sio/unbind'"
+ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6015", MODE:="666", PROGRAM="/bin/sh -c 'echo -n $id:1.0 > /sys/bus/usb/drivers/ftdi_sio/unbind'"
+
+# Following rule provides access to use the USB endpoint
+SUBSYSTEMS=="usb", ACTION=="add", MODE="0666", GROUP="dialout"
