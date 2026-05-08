@@ -49,16 +49,9 @@ endif()
 set(ARCHIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${FTDI_ARCHIVE}")
 set(TEMP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/temp_extract")
 
-if(WIN32)
-    set(NEED_DOWNLOAD FALSE)
-    if(NOT EXISTS "${DEBUG_LIB}" OR NOT EXISTS "${RELEASE_LIB}")
-        set(NEED_DOWNLOAD TRUE)
-    endif()
-else()
-    set(NEED_DOWNLOAD FALSE)
-    if(NOT EXISTS "${DEBUG_LIB}" OR NOT EXISTS "${RELEASE_LIB}")
-        set(NEED_DOWNLOAD TRUE)
-    endif()
+set(NEED_DOWNLOAD FALSE)
+if(NOT EXISTS "${DEBUG_LIB}" OR NOT EXISTS "${RELEASE_LIB}")
+    set(NEED_DOWNLOAD TRUE)
 endif()
 
 if(NEED_DOWNLOAD)
@@ -128,8 +121,11 @@ if(WIN32)
     set_target_properties(ftd2xx_release PROPERTIES IMPORTED_LOCATION "${RELEASE_LIB}")
 else()
     add_library(ftd2xx STATIC IMPORTED GLOBAL)
-    set_target_properties(ftd2xx PROPERTIES IMPORTED_LOCATION "${DEBUG_LIB}")
-    set_target_properties(ftd2xx PROPERTIES IMPORTED_LOCATION "${RELEASE_LIB}")
+    set_target_properties(ftd2xx PROPERTIES
+        IMPORTED_LOCATION_DEBUG   "${DEBUG_LIB}"
+        IMPORTED_LOCATION_RELEASE "${RELEASE_LIB}"
+        IMPORTED_LOCATION         "${RELEASE_LIB}"
+    )
 endif()
 
 if(WIN32 AND DEFINED ENV{QTDIR})
