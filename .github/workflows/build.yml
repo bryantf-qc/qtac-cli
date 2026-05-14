@@ -89,7 +89,7 @@ jobs:
     - name: Extract FTDI library on Linux
       run: |
         mkdir -p __Builds/Linux/Debug/lib __Builds/Linux/Release/lib
-        tar -xzf third-party/libftd2xx-linux-x86_64-1.4.33.tgz -C third-party/
+        tar -xvf third-party/libftd2xx-linux-x86_64-1.4.33.tgz -C third-party/
         find third-party/ -name "libftd2xx-static.a" -exec cp {} __Builds/Linux/Debug/lib/libftd2xx.a \;
         cp __Builds/Linux/Debug/lib/libftd2xx.a __Builds/Linux/Release/lib/libftd2xx.a
 
