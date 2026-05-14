@@ -19,6 +19,12 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y python3-pip wget libxkbcommon-x11-0 x11-common libxcb-xinerama0-dev build-essential libgl1-mesa-dev mesa-common-dev uuid-dev libpulse-dev
 
+    - name: Cache Qt installation on Linux
+      uses: actions/cache@v4
+      with:
+        path: ${{ matrix.qt_version }}/gcc_64
+        key: ${{ runner.os }}-qt-${{ matrix.qt_version }}
+
     - name: Install aqtinstall
       run: pip install aqtinstall
 
@@ -31,11 +37,11 @@ jobs:
         echo "QT_ROOT_DIR=$HOME/work/qcom-test-automation-controller/qcom-test-automation-controller/${{ matrix.qt_version }}/gcc_64" >> $GITHUB_ENV
         echo "$HOME/work/qcom-test-automation-controller/qcom-test-automation-controller/${{ matrix.qt_version }}/gcc_64/bin" >> $GITHUB_PATH
 
-    - name: Cache Qt installation on Linux
+    - name: Cache FTDI archive on Linux
       uses: actions/cache@v4
       with:
-        path: ${{ env.QT_ROOT_DIR }}
-        key: ${{ runner.os }}-qt-${{ matrix.qt_version }}
+        path: third-party/libftd2xx-linux-x86_64-1.4.33.tgz
+        key: ftdi-linux-1.4.33
 
     - name: Configure CMake for ${{ matrix.build_type }}
       run: |
@@ -60,6 +66,12 @@ jobs:
       shell: pwsh
       run: pip install aqtinstall
 
+    - name: Cache Qt installation on Windows
+      uses: actions/cache@v4
+      with:
+        path: C:\Qt\${{ matrix.qt_version }}\msvc2022_64
+        key: ${{ runner.os }}-qt-${{ matrix.qt_version }}
+
     - name: Install Qt ${{ matrix.qt_version }} for MSVC
       shell: pwsh
       run: |
@@ -69,11 +81,11 @@ jobs:
         echo "QT_ROOT_DIR=$qtRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         echo "$qtRoot\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-    - name: Cache Qt installation on Windows
+    - name: Cache FTDI archive on Windows
       uses: actions/cache@v4
       with:
-        path: ${{ env.QT_ROOT_DIR }}
-        key: ${{ runner.os }}-qt-${{ matrix.qt_version }}
+        path: third-party\CDM-v2.12.36.20-WHQL-Certified.zip
+        key: ftdi-windows-2.12.36.20
 
     - name: Configure CMake for ${{ matrix.build_type }}
       shell: pwsh
