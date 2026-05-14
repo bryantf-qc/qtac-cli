@@ -12,14 +12,16 @@ jobs:
       id: cache-ftdi-linux
       uses: actions/cache@v4
       with:
-        path: third-party/libftd2xx-linux-x86_64-1.4.33.tgz
-        key: ftdi-linux-1.4.33
+        path: third-party/libftd2xx-linux-x86_64-1.4.34.tgz
+        key: ftdi-linux-1.4.34
 
     - name: Download FTDI archive on Linux
       if: steps.cache-ftdi-linux.outputs.cache-hit != 'true'
       run: |
-        wget -q "https://ftdichip.com/wp-content/uploads/2025/03/libftd2xx-linux-x86_64-1.4.33.tgz" \
-          -O third-party/libftd2xx-linux-x86_64-1.4.33.tgz
+        wget -q "https://github.com/user-attachments/files/27773138/libftd2xx-linux-x86_64-1.4.34.tgz.zip" \
+          -O third-party/libftd2xx-linux-x86_64-1.4.34.tgz.zip
+        unzip -p third-party/libftd2xx-linux-x86_64-1.4.34.tgz.zip > third-party/libftd2xx-linux-x86_64-1.4.34.tgz
+        rm third-party/libftd2xx-linux-x86_64-1.4.34.tgz.zip
 
   fetch-ftdi-windows:
     runs-on: windows-2022
@@ -37,7 +39,7 @@ jobs:
       if: steps.cache-ftdi-windows.outputs.cache-hit != 'true'
       shell: pwsh
       run: |
-        Invoke-WebRequest -Uri "https://ftdichip.com/wp-content/uploads/2025/03/CDM-v2.12.36.20-WHQL-Certified.zip" `
+        Invoke-WebRequest -Uri "https://github.com/user-attachments/files/27773090/CDM-v2.12.36.20-WHQL-Certified.zip" `
           -OutFile "third-party\CDM-v2.12.36.20-WHQL-Certified.zip"
 
   build-linux:
@@ -77,8 +79,8 @@ jobs:
     - name: Restore FTDI archive on Linux
       uses: actions/cache/restore@v4
       with:
-        path: third-party/libftd2xx-linux-x86_64-1.4.33.tgz
-        key: ftdi-linux-1.4.33
+        path: third-party/libftd2xx-linux-x86_64-1.4.34.tgz
+        key: ftdi-linux-1.4.34
 
     - name: Configure CMake for ${{ matrix.build_type }}
       run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR/lib/cmake"
