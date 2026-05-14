@@ -32,7 +32,7 @@
 
 # Author: Biswajit Roy (biswroy@qti.qualcomm.com)
 
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.22)
 
 if(WIN32)
     set(FTDI_URL "https://ftdichip.com/wp-content/uploads/2025/03/CDM-v2.12.36.20-WHQL-Certified.zip")

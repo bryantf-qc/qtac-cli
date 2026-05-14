@@ -61,8 +61,7 @@ endif()
 
 if(UNIX)
     set(CMAKE_CXX_STANDARD 20)
-    list(APPEND QCOMMON_DEFINITIONS __X86_64__)
-    
+
     # Unix compiler flags
     set(QCOMMON_CXX_FLAGS
         -Werror

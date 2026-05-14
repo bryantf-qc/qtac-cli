@@ -32,7 +32,7 @@ qt_add_library(${LIBRARY_NAME} STATIC
 )
 
 set_target_properties(${LIBRARY_NAME} PROPERTIES
-    VERSION ALPACA_VERSION
+    VERSION ${QTAC_VERSION}
 )
 
 target_include_directories(${LIBRARY_NAME} PUBLIC
@@ -41,13 +41,13 @@ target_include_directories(${LIBRARY_NAME} PUBLIC
 )
 
 target_link_directories(${LIBRARY_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}/__Builds/x64/$<CONFIG>/lib
+    ${STATIC_LIBPATH}
 )
 
 target_compile_definitions(${LIBRARY_NAME} PUBLIC
     QTAC_STATIC
     QT_DEPRECATED_WARNINGS
-    QT_DISABLE_DEPRECATED_UP_TO=0x060600
+    QT_DISABLE_DEPRECATED_UP_TO=0x060900
     $<$<CONFIG:Debug>:DEBUG;_DEBUG>
     $<$<NOT:$<CONFIG:Debug>>:NDEBUG;_NDEBUG>
 )

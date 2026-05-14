@@ -37,7 +37,6 @@ include(${CMAKE_SOURCE_DIR}/src/libraries/qcommon-console/Common.cmake)
 set(APP_NAME UpdateDeviceList)
 
 qt_add_executable(${APP_NAME}
-    FTDITemplateCompiler.cpp FTDITemplateCompiler.h
     UDLCommandLine.cpp UDLCommandLine.h
     UpdateDeviceList.cpp UpdateDeviceList.h
     main.cpp
@@ -49,7 +48,7 @@ target_include_directories(${APP_NAME} PRIVATE
 )
 
 target_link_directories(${APP_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}/__Builds/x64/$<CONFIG>/lib
+    ${STATIC_LIBPATH}
 )
 
 target_link_libraries(${APP_NAME} PRIVATE
@@ -67,7 +66,7 @@ if(WIN32)
     )
 endif()
 
-if(LINUX)
+if(UNIX AND NOT APPLE)
     target_link_libraries(${APP_NAME} PRIVATE
         dl
     )

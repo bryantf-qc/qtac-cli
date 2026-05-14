@@ -42,7 +42,7 @@ set(TACDEV ${CMAKE_SOURCE_DIR}/interfaces/C++/TACDev)
 
 # Common compile definitions
 set(QCOMMONCONSOLE_DEFINITIONS
-    QT_DISABLE_DEPRECATED_UP_TO=0x060600
+    QT_DISABLE_DEPRECATED_UP_TO=0x060900
     QTAC_STATIC
 )
 
@@ -55,8 +55,7 @@ endif()
 
 if(UNIX)
     set(CMAKE_CXX_STANDARD 20)
-    list(APPEND QCOMMONCONSOLE_DEFINITIONS __X86_64__)
-    
+
     # Unix compiler flags
     set(QCOMMONCONSOLE_CXX_FLAGS
         -Werror

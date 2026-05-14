@@ -32,7 +32,7 @@
 
 # Author: Biswajit Roy (biswroy@qti.qualcomm.com)
 
-include(${CMAKE_SOURCE_DIR}/src/libraries/qcommon/Common.cmake)
+include(${CMAKE_SOURCE_DIR}/src/libraries/qcommon-console/Common.cmake)
 
 set(APP_NAME DevList)
 
@@ -46,13 +46,13 @@ target_include_directories(${APP_NAME} PRIVATE
 
 target_compile_definitions(${APP_NAME} PRIVATE
     QTAC_STATIC
-    QT_DISABLE_DEPRECATED_UP_TO=0x060600
+    QT_DISABLE_DEPRECATED_UP_TO=0x060900
     $<$<CONFIG:Debug>:DEBUG;_DEBUG>
     $<$<NOT:$<CONFIG:Debug>>:NDEBUG;_NDEBUG>
 )
 
 target_link_directories(${APP_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}/__Builds/x64/$<CONFIG>/lib
+    ${STATIC_LIBPATH}
 )
 
 target_link_libraries(${APP_NAME} PRIVATE
