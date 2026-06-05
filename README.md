@@ -51,6 +51,7 @@ QTAC is a software suite that enables users to control Qualcomm devices remotely
 | :-- | :-- | :-- |
 | **OS** | Windows / Debian | Windows 10+ / Ubuntu 22.04+ |
 | **Compiler** | [MSVC 2022](https://aka.ms/vs/17/release/vs_community.exe) / GCC | MSVC 2022 / GCC-11, G++-11, GLIBC-2.35 |
+| **Build System** | [CMake](https://cmake.org/download/) | 3.22+ |
 | **UI Framework** | [Qt Open-source](https://www.qt.io/download-qt-installer-oss) | 6.9.0+ |
 
 > [!NOTE]
@@ -120,11 +121,11 @@ __Builds\x64\Release\QTAC.exe
 1. **Qt Installation** (choose one):
    
    **Option A**: Qt Online Installer
-   - Install Qt 6.9+ for **GCC 64-bit** and **Qt Serial Port** component using [Qt Online Installer](https://www.qt.io/download-qt-installer-oss)
+   - Install Qt 6.9+ for **GCC 64-bit** and **Qt Serial Port** and **Qt Multimedia** components using [Qt Online Installer](https://www.qt.io/download-qt-installer-oss)
    
    **Option B**: Quick Installation via apt
    ```bash
-   sudo apt install qt6-base-dev qt6-serialport-dev
+   sudo apt install qt6-base-dev qt6-serialport-dev qt6-multimedia-dev
    ```
 2. **Runtime Dependencies**:
    ```bash
@@ -145,15 +146,15 @@ Execute `build.sh` to generate executables:
 ```
 
 **Build output**:
-- Debug: `__Builds/x64/Debug`
-- Release: `__Builds/x64/Release`
+- Debug: `__Builds/Linux/Debug`
+- Release: `__Builds/Linux/Release`
 
 > [!NOTE]
 > Ensure that [make](https://www.gnu.org/software/make/) is available in your environment before building.
 
 **Usage**:
 ```bash
-./__Builds/x64/Release/QTAC
+./__Builds/Linux/Release/QTAC
 ```
 
 ## Repository Structure

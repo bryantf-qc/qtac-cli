@@ -38,7 +38,6 @@
 */
 
 // Update Device List
-#include "FTDITemplateCompiler.h"
 #include "UDLCommandLine.h"
 #include "UpdateDeviceList.h"
 
@@ -75,7 +74,6 @@ int main(int argc, char *argv[])
 
 	UDLCommandLine parser(a.arguments());
 	UpdateDeviceList deviceList;
-    FTDITemplateCompiler ftdiTemplateCompiler;
 
 	bool verbose = parser.verbose();
 
@@ -85,10 +83,6 @@ int main(int argc, char *argv[])
 		deviceList.setDeviceListDir(fileDir);
 		deviceList.setVerbosity(verbose);
 		deviceList.write();
-
-        ftdiTemplateCompiler.setDeviceListDir(fileDir);
-        ftdiTemplateCompiler.setVerbosity(verbose);
-        ftdiTemplateCompiler.write();
 	}
 	else
 	{

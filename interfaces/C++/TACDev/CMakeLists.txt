@@ -32,7 +32,7 @@
 
 # Author: Biswajit Roy (biswroy@qti.qualcomm.com)
 
-include(${CMAKE_SOURCE_DIR}/src/libraries/qcommon/Common.cmake)
+include(${CMAKE_SOURCE_DIR}/src/libraries/qcommon-console/Common.cmake)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(LIBRARY_NAME TACDevd)
@@ -50,12 +50,12 @@ target_include_directories(${LIBRARY_NAME} PUBLIC
 )
 
 target_link_directories(${LIBRARY_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}/__Builds/x64/$<CONFIG>/lib
+    ${STATIC_LIBPATH}
 )
 
 target_compile_definitions(${LIBRARY_NAME} PUBLIC
     QTAC_STATIC
-    QT_DISABLE_DEPRECATED_UP_TO=0x060600
+    QT_DISABLE_DEPRECATED_UP_TO=0x060900
     TACDEV_LIBRARY
     $<$<CONFIG:Debug>:DEBUG;_DEBUG>
     $<$<NOT:$<CONFIG:Debug>>:NDEBUG;_NDEBUG>

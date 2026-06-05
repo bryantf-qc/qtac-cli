@@ -32,7 +32,7 @@
 
 # Author: Biswajit Roy (biswroy@qti.qualcomm.com)
 
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.22)
 project(QTAC-Workspace VERSION 1.0 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)

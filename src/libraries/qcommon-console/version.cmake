@@ -33,7 +33,7 @@
 # Maintainer: Biswajit Roy (biswroy@qti.qualcomm.com)
 # Original author: Michael Simpson (msimpson@qti.qualcomm.com)
 
-set(ALPACA_VERSION "5.5.2")
+set(QTAC_VERSION "5.5.2")
 set(BUG_WRITER_VERSION "2.0.0")
 set(DEVICE_CATALOG_VERSION "2.0.0")
 set(EPM_SERVER_VERSION "2.0.0")

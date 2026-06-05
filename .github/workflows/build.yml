@@ -3,62 +3,114 @@ name: CMake Build
 on: [push, pull_request]
 
 jobs:
+  fetch-ftdi-linux:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Cache FTDI archive on Linux
+      id: cache-ftdi-linux
+      uses: actions/cache@v5
+      with:
+        path: third-party/libftd2xx-linux-x86_64-1.4.33.tgz
+        key: ftdi-linux-1.4.33
+
+    - name: Download FTDI archive on Linux
+      if: steps.cache-ftdi-linux.outputs.cache-hit != 'true'
+      run: |
+        curl --ssl-no-revoke "https://web.archive.org/web/20250822044524/https://ftdichip.com/wp-content/uploads/2025/03/libftd2xx-linux-x86_64-1.4.33.tgz" -o third-party/libftd2xx-linux-x86_64-1.4.33.tgz
+
+  fetch-ftdi-windows:
+    runs-on: windows-2022
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Cache FTDI archive on Windows
+      id: cache-ftdi-windows
+      uses: actions/cache@v5
+      with:
+        path: third-party\CDM-v2.12.36.4-WHQL-Certified.zip
+        key: ftdi-windows-2.12.36.4
+
+    - name: Download FTDI archive on Windows
+      if: steps.cache-ftdi-windows.outputs.cache-hit != 'true'
+      shell: pwsh
+      run: curl --ssl-no-revoke "https://web.archive.org/web/20250820134143/https://ftdichip.com/wp-content/uploads/2023/09/CDM-v2.12.36.4-WHQL-Certified.zip" -o "third-party\CDM-v2.12.36.4-WHQL-Certified.zip"
+
   build-linux:
+    needs: fetch-ftdi-linux
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-22.04, ubuntu-latest]
         qt_version: ['6.9.2', '6.10.0']
         build_type: [Debug, Release]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y python3-pip wget libxkbcommon-x11-0 x11-common libxcb-xinerama0-dev build-essential libgl1-mesa-dev mesa-common-dev uuid-dev libpulse-dev
 
+    - name: Cache Qt installation on Linux
+      uses: actions/cache@v5
+      with:
+        path: ${{ matrix.qt_version }}/gcc_64
+        key: ${{ matrix.os }}-qt-${{ matrix.qt_version }}
+
     - name: Install aqtinstall
       run: pip install aqtinstall
 
     - name: Install Qt ${{ matrix.qt_version }} on ${{ matrix.os }}
       run: |
-        # Install base Qt first
         aqt install-qt linux desktop ${{ matrix.qt_version }} linux_gcc_64
-        # Then install required modules
         aqt install-qt linux desktop ${{ matrix.qt_version }} linux_gcc_64 -m qtmultimedia qtserialport
         echo "QT_ROOT_DIR=$HOME/work/qcom-test-automation-controller/qcom-test-automation-controller/${{ matrix.qt_version }}/gcc_64" >> $GITHUB_ENV
         echo "$HOME/work/qcom-test-automation-controller/qcom-test-automation-controller/${{ matrix.qt_version }}/gcc_64/bin" >> $GITHUB_PATH
 
-    - name: Cache Qt installation on Linux
-      uses: actions/cache@v4
+    - name: Restore FTDI archive on Linux
+      uses: actions/cache/restore@v5
       with:
-        path: ${{ env.QT_ROOT_DIR }}
-        key: ${{ runner.os }}-qt-${{ matrix.qt_version }}
+        path: third-party/libftd2xx-linux-x86_64-1.4.33.tgz
+        key: ftdi-linux-1.4.33
+
+    - name: Extract FTDI library on Linux
+      run: |
+        mkdir -p __Builds/Linux/Debug/lib __Builds/Linux/Release/lib
+        tar -xvf third-party/libftd2xx-linux-x86_64-1.4.33.tgz -C third-party/
+        find third-party/ -name "libftd2xx-static.a" -exec cp {} __Builds/Linux/Debug/lib/libftd2xx.a \;
+        cp __Builds/Linux/Debug/lib/libftd2xx.a __Builds/Linux/Release/lib/libftd2xx.a
 
     - name: Configure CMake for ${{ matrix.build_type }}
-      run: |
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR/lib/cmake"
 
     - name: Build with ${{ matrix.build_type }}
       run: cmake --build build --config ${{ matrix.build_type }}
 
   build-windows:
+    needs: fetch-ftdi-windows
     runs-on: windows-2022
     strategy:
+      fail-fast: false
       matrix:
         qt_version: ['6.9.2', '6.10.0']
         build_type: [Debug, Release]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Install Python dependencies
       shell: pwsh
       run: pip install aqtinstall
+
+    - name: Cache Qt installation on Windows
+      uses: actions/cache@v5
+      with:
+        path: C:\Qt\${{ matrix.qt_version }}\msvc2022_64
+        key: ${{ runner.os }}-qt-${{ matrix.qt_version }}
 
     - name: Install Qt ${{ matrix.qt_version }} for MSVC
       shell: pwsh
@@ -69,18 +121,39 @@ jobs:
         echo "QT_ROOT_DIR=$qtRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         echo "$qtRoot\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-    - name: Cache Qt installation on Windows
-      uses: actions/cache@v4
+    - name: Restore FTDI archive on Windows
+      uses: actions/cache/restore@v5
       with:
-        path: ${{ env.QT_ROOT_DIR }}
-        key: ${{ runner.os }}-qt-${{ matrix.qt_version }}
+        path: third-party\CDM-v2.12.36.4-WHQL-Certified.zip
+        key: ftdi-windows-2.12.36.4
+
+    - name: Extract FTDI library on Windows
+      shell: pwsh
+      run: |
+        $debugLib  = "__Builds\x64\Debug\lib"
+        $releaseLib = "__Builds\x64\Release\lib"
+        $debugBin  = "__Builds\x64\Debug\bin"
+        $releaseBin = "__Builds\x64\Release\bin"
+        New-Item -ItemType Directory -Force -Path $debugLib, $releaseLib, $debugBin, $releaseBin | Out-Null
+
+        $tmp = "third-party\ftdi_extract"
+        Expand-Archive -Path "third-party\CDM-v2.12.36.4-WHQL-Certified.zip" -DestinationPath $tmp -Force
+
+        $lib = Get-ChildItem -Path $tmp -Filter "ftd2xx.lib" -Recurse | Where-Object { $_.FullName -match "amd64" } | Select-Object -First 1
+        if (-not $lib) { $lib = Get-ChildItem -Path $tmp -Filter "ftd2xx.lib" -Recurse | Select-Object -First 1 }
+        Copy-Item $lib.FullName -Destination $debugLib
+        Copy-Item $lib.FullName -Destination $releaseLib
+
+        $dll = Get-ChildItem -Path $tmp -Filter "FTD2XX64.dll" -Recurse | Select-Object -First 1
+        if ($dll) {
+            Copy-Item $dll.FullName -Destination "$debugBin\ftd2xx.dll"
+            Copy-Item $dll.FullName -Destination "$releaseBin\ftd2xx.dll"
+        }
+        Remove-Item -Recurse -Force $tmp
 
     - name: Configure CMake for ${{ matrix.build_type }}
       shell: pwsh
-      run: |
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_PREFIX_PATH="$env:QT_ROOT_DIR\lib\cmake"
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_PREFIX_PATH="$env:QT_ROOT_DIR\lib\cmake"
 
     - name: Build with ${{ matrix.build_type }}
       shell: pwsh

@@ -359,11 +359,7 @@ void ConfigWindow::on__actionSave_triggered()
 		else
 		{
 			// run update device list on experimental configurations
-#ifdef Q_OS_LINUX
-			QString program = "/opt/qcom/Alpaca/bin/UpdateDeviceList";
-#else
-			QString program = "UpdateDeviceList";
-#endif
+			QString program = applicationBinPath() + "UpdateDeviceList";
 
 			QStringList arguments;
 
@@ -387,11 +383,7 @@ void ConfigWindow::on__actionQuit_triggered()
 
 void ConfigWindow::on__actionBugWriter_triggered()
 {
-#ifdef Q_OS_LINUX
-	QString program = "/opt/qcom/Alpaca/bin/BugWriter";
-#else
-	QString program = "BugWriter";
-#endif
+	QString program = applicationBinPath() + "BugWriter";
 
 	QStringList arguments;
 	arguments << "product:TAC";

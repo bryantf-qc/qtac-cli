@@ -32,13 +32,13 @@
 
 # Author: Biswajit Roy (biswroy@qti.qualcomm.com)
 
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.22)
 project(programmers VERSION 1.0 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core)
 
-qt_standard_project_setup()
+qt_standard_project_setup(REQUIRES 6.9)
 
 add_subdirectory(lite-programmer)

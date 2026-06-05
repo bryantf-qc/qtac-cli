@@ -249,11 +249,7 @@ void DeviceCatalog::invokeProgrammer(const DebugBoardType type)
 
 void DeviceCatalog::invokeLiteProgrammer(const QString& serialNumber, const PlatformID platformId)
 {
-#ifdef Q_OS_LINUX
-	QString program = "/opt/qcom/Alpaca/bin/LiteProgrammer";
-#else
-	QString program = "LiteProgrammer";
-#endif
+	QString program = applicationBinPath() + "LiteProgrammer";
 	QStringList arguments; //-p platformid=18 serial=FT6G3Z6Y
 	arguments << "-p";
 	arguments << "serial=" + serialNumber;
@@ -273,11 +269,7 @@ void DeviceCatalog::invokeLiteProgrammer(const QString& serialNumber, const Plat
 
 void DeviceCatalog::invokePSOCProgrammer(const QString &serialNumber, const PlatformID platformId)
 {
-#ifdef Q_OS_LINUX
-	QString program = "/opt/qcom/Alpaca/bin/PSOCProgrammer";
-#else
-	QString program = "PSOCProgrammer";
-#endif
+	QString program = applicationBinPath() + "PSOCProgrammer";
 	QStringList arguments; //-p platformid=18 serial=FT6G3Z6Y
 	arguments << "-p";
 	arguments << "serial=" + serialNumber;
@@ -297,11 +289,7 @@ void DeviceCatalog::invokePSOCProgrammer(const QString &serialNumber, const Plat
 
 void DeviceCatalog::onConfigurationLinkClicked(QTableWidgetItem* twi)
 {
-#ifdef Q_OS_LINUX
-	QString program = "/opt/qcom/Alpaca/bin/TACConfigEditor";
-#else
-	QString program = "TACConfigEditor";
-#endif
+	QString program = applicationBinPath() + "TACConfigEditor";
 	if (twi->column() == 5)
 	{
 		QString configPath = twi->text();

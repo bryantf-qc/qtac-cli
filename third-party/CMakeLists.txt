@@ -32,15 +32,15 @@
 
 # Author: Biswajit Roy (biswroy@qti.qualcomm.com)
 
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.22)
 
 if(WIN32)
-    set(FTDI_URL "https://ftdichip.com/wp-content/uploads/2025/03/CDM-v2.12.36.20-WHQL-Certified.zip")
-    set(FTDI_ARCHIVE "CDM-v2.12.36.20-WHQL-Certified.zip")
+    set(FTDI_URL "https://web.archive.org/web/20250820134143/https://ftdichip.com/wp-content/uploads/2023/09/CDM-v2.12.36.4-WHQL-Certified.zip")
+    set(FTDI_ARCHIVE "CDM-v2.12.36.4-WHQL-Certified.zip")
     set(DEBUG_LIB "${CMAKE_SOURCE_DIR}/__Builds/x64/Debug/lib/ftd2xx.lib")
     set(RELEASE_LIB "${CMAKE_SOURCE_DIR}/__Builds/x64/Release/lib/ftd2xx.lib")
 else()
-    set(FTDI_URL "https://ftdichip.com/wp-content/uploads/2025/03/libftd2xx-linux-x86_64-1.4.33.tgz")
+    set(FTDI_URL "https://web.archive.org/web/20250822044524/https://ftdichip.com/wp-content/uploads/2025/03/libftd2xx-linux-x86_64-1.4.33.tgz")
     set(FTDI_ARCHIVE "libftd2xx-linux-x86_64-1.4.33.tgz")
     set(DEBUG_LIB "${CMAKE_SOURCE_DIR}/__Builds/Linux/Debug/lib/libftd2xx.a")
     set(RELEASE_LIB "${CMAKE_SOURCE_DIR}/__Builds/Linux/Release/lib/libftd2xx.a")
@@ -49,16 +49,9 @@ endif()
 set(ARCHIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${FTDI_ARCHIVE}")
 set(TEMP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/temp_extract")
 
-if(WIN32)
-    set(NEED_DOWNLOAD FALSE)
-    if(NOT EXISTS "${DEBUG_LIB}" OR NOT EXISTS "${RELEASE_LIB}")
-        set(NEED_DOWNLOAD TRUE)
-    endif()
-else()
-    set(NEED_DOWNLOAD FALSE)
-    if(NOT EXISTS "${DEBUG_LIB}" OR NOT EXISTS "${RELEASE_LIB}")
-        set(NEED_DOWNLOAD TRUE)
-    endif()
+set(NEED_DOWNLOAD FALSE)
+if(NOT EXISTS "${DEBUG_LIB}" OR NOT EXISTS "${RELEASE_LIB}")
+    set(NEED_DOWNLOAD TRUE)
 endif()
 
 if(NEED_DOWNLOAD)
@@ -128,8 +121,11 @@ if(WIN32)
     set_target_properties(ftd2xx_release PROPERTIES IMPORTED_LOCATION "${RELEASE_LIB}")
 else()
     add_library(ftd2xx STATIC IMPORTED GLOBAL)
-    set_target_properties(ftd2xx PROPERTIES IMPORTED_LOCATION "${DEBUG_LIB}")
-    set_target_properties(ftd2xx PROPERTIES IMPORTED_LOCATION "${RELEASE_LIB}")
+    set_target_properties(ftd2xx PROPERTIES
+        IMPORTED_LOCATION_DEBUG   "${DEBUG_LIB}"
+        IMPORTED_LOCATION_RELEASE "${RELEASE_LIB}"
+        IMPORTED_LOCATION         "${RELEASE_LIB}"
+    )
 endif()
 
 if(WIN32 AND DEFINED ENV{QTDIR})
