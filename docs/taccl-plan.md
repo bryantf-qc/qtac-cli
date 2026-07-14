@@ -3,209 +3,190 @@
 ## Context
 Create a GNU-compliant command-line interface exposing all functionality from `interfaces/C++/TACDev/TACDev.h`. This enables shell scripting and automation without C++ code.
 
-## CLI Design
+## Global Options
 
-### Executable Name
-`taccl` (pronounced "tackle")
+| Option | Description |
+| :-- | :-- |
+| `-d, --device=<port>` | Select device by port name |
+| `-s, --serial=<serial>` | Select device by serial number |
+| `-o, --output=<format>` | Output format: `text` (default) or `json` |
+| `-h, --help` | Show help |
+| `--version` | Show taccl and TAC library versions |
 
-### GNU Conventions
-- Short options: `-d`, `-s`, `-j`, `-q`, `-h`, `-v`
-- Long options: `--device`, `--serial`, `--json`, `--quiet`, `--help`, `--version`
-- Long option arguments: `--device=COM3` or `--device COM3` (both supported)
-- `--` separates options from arguments
-- Options can appear in any order before arguments
-- `--help` and `--version` are mandatory
+`-d` and `-s` are mutually exclusive. One is required for device operations (unless set via environment).
 
-### Global Options
-```
--d, --device=<port>     Specify device by port name
--s, --serial=<serial>   Specify device by serial number
--j, --json              Output in JSON format
--q, --quiet             Suppress non-essential output
--h, --help              Show help
-    --version           Show version info
-```
-
-### Environment Variables
-```
-TACCL_DEVICE           Default device port (overridden by -d)
-TACCL_SERIAL           Default device serial (overridden by -s)
-TACCL_JSON             Set to "1" for JSON output by default
-```
-
-Note: `-d` and `-s` are mutually exclusive. One is required for device operations (unless set via environment).
+Env: `TACCL_DEVICE` (default for `-d`), `TACCL_SERIAL` (default for `-s`), `TACCL_OUTPUT=json` (default output format).
 
 ---
 
-## Command Structure
+## Commands
 
-### 1. Device Discovery
+### Device Discovery
 ```
-taccl list                     List all connected TAC devices
-taccl list -j                  JSON output
+taccl list
 ```
+Backend: `GetDeviceCount` + `GetPortData`
 
-### 2. Version Information
+### Version Information
 ```
-taccl version                  Show QTAC and TAC library versions
+taccl version
 ```
+Backend: `GetTACVersion`
 
-### 3. Device Information
+### Device Information
 ```
-taccl info --device=<port>              Show all device info
-taccl info --serial=<serial>            Same, using serial number
-
-# Specific fields (flags, no arguments):
-taccl info --device=<port> --name
-taccl info --device=<port> --firmware
-taccl info --device=<port> --hardware
-taccl info --device=<port> --hardware-version
-taccl info --device=<port> --uuid
-taccl info --device=<port> --reset-count
+taccl info (-d|-s)                        Show all device info
+taccl info (-d|-s) --name                 Show name only
+taccl info (-d|-s) --firmware             Show firmware version only
+taccl info (-d|-s) --hardware             Show hardware only
+taccl info (-d|-s) --hardware-version     Show hardware version only
+taccl info (-d|-s) --uuid                 Show UUID only
 ```
+Backend: `GetName`, `GetFirmwareVersion`, `GetHardware`, `GetHardwareVersion`, `GetUUID`
 
-### 4. Device Configuration
+### Device Configuration
 ```
-taccl set --device=<port> --name=<new-name>
-taccl set --device=<port> --clear-reset-count
+taccl set (-d|-s) --name=<value>          Set device name
 ```
+Backend: `SetName`
 
-### 5. State Controls
-Pattern: `taccl <control> --device=<port> [--state=on|off]` (omit --state to query)
-
+### Logging
 ```
-# Power
-taccl battery --device=<port>                 Query battery state
-taccl battery --device=<port> --state=on      Enable battery
-taccl battery --device=<port> --state=off     Disable battery
-taccl external-power --device=<port> --state=on|off
-
-# USB
-taccl usb0 --device=<port> [--state=on|off]
-taccl usb1 --device=<port> [--state=on|off]
-
-# Keys
-taccl power-key --device=<port> [--state=on|off]
-taccl volume-up --device=<port> [--state=on|off]
-taccl volume-down --device=<port> [--state=on|off]
-
-# Disconnect controls
-taccl disconnect-uim1 --device=<port> [--state=on|off]
-taccl disconnect-uim2 --device=<port> [--state=on|off]
-taccl disconnect-sdcard --device=<port> [--state=on|off]
-taccl disconnect-headset --device=<port> [--state=on|off]
-
-# EDL
-taccl primary-edl --device=<port> [--state=on|off]
-taccl secondary-edl --device=<port> [--state=on|off]
-
-# Other
-taccl force-pshold --device=<port> [--state=on|off]
-taccl secondary-pm-resin --device=<port> [--state=on|off]
-taccl eud --device=<port> [--state=on|off]
-
-# Raw pin (no query)
-taccl pin --device=<port> --pin=<number> --state=on|off
+taccl logging (-d|-s)                     Query logging state
+taccl logging (-d|-s) --state=true|false  Set logging state
 ```
+Backend: `GetLoggingState`, `SetLoggingState`
 
-### 6. Boot Sequences
+### Commands
 ```
-taccl boot --device=<port> --mode=power-on
-taccl boot --device=<port> --mode=power-off
-taccl boot --device=<port> --mode=fastboot
-taccl boot --device=<port> --mode=uefi
-taccl boot --device=<port> --mode=edl
-taccl boot --device=<port> --mode=secondary-edl
+taccl commands (-d|-s)                              List available stateful commands
+taccl quick-commands (-d|-s)                        List available quick commands
+taccl command (-d|-s) --name=<cmd>                  Query command state
+taccl command (-d|-s) --name=<cmd> --state=true|false   Set command state
+taccl command (-d|-s) --name=<cmd>                  Run quick command (no --state)
 ```
+Backend (list): `GetCommandCount` + `GetCommand`, `GetQuickCommandCount` + `GetQuickCommand`
+Backend (send/query): `SendCommand`, `GetCommandState`
 
-### 7. Commands
-```
-taccl commands --device=<port>                       List available commands
-taccl command --device=<port> --name=<cmd>           Query command state
-taccl command --device=<port> --name=<cmd> --state=on|off   Set command state
+Note: `taccl command` handles both stateful and quick commands. For quick commands, omit `--state`. The CLI enumerates both lists to determine whether `--state` is required.
 
-taccl quick-commands --device=<port>                 List quick commands
+### Script Variables
 ```
+taccl vars (-d|-s)                                  List all variables
+taccl var (-d|-s) --name=<var>                      Get variable value
+taccl var (-d|-s) --name=<var> --value=<val>        Set variable value
+```
+Backend: `GetScriptVariableCount` + `GetScriptVariable`, `UpdateScriptVariableValue`
 
-### 8. Script Variables
+### Utility
 ```
-taccl vars --device=<port>                           List all variables
-taccl var --device=<port> --name=<var>               Get variable value
-taccl var --device=<port> --name=<var> --value=<val> Set variable value
+taccl help-text (-d|-s)                             Print device help text
 ```
+Backend: `GetHelpText`
 
-### 9. Utility
-```
-taccl help-text --device=<port>                      Get device help text
-taccl queue-clear --device=<port>                    Check if command queue is clear
-taccl logging [--state=on|off]                       Get/set logging state (omit --state to query)
-```
+---
+
+## Boolean Values
+
+Input accepts: `true`, `false`, `1`, `0`
+Output is always: `true` or `false`
+
+---
+
+## Queue Management
+
+Before every `CloseTACHandle`, the CLI automatically calls `IsCommandQueueClear` and waits for the queue to drain. This is not user-visible.
+
+---
+
+## Exit Codes
+
+| Code | Meaning |
+| :-- | :-- |
+| 0 | Success |
+| 1 | General error |
+| 2 | Device not found |
+| 3 | Invalid arguments / usage error |
+| 4 | TAC command failed |
+| 5 | Initialization failed |
+
+Error messages sourced from `GetLastTACError`.
 
 ---
 
 ## Output Formats
 
 ### Human-readable (default)
+
 ```
 $ taccl list
 PORT     SERIAL
 COM3     ABC123
 COM5     DEF456
 
-$ taccl info --device=COM3
+$ taccl info -d=COM3
 name: TAC-Device-1
 firmware: 1.2.3
 hardware: TAC-Lite
 hardware-version: 2.0
 uuid: 550e8400-e29b-41d4-a716-446655440000
-reset-count: 5
 
-$ taccl battery --device=COM3
-on
+$ taccl command -d=COM3 --name=battery
+true
 
-$ taccl battery --device=COM3 --state=off
-off
+$ taccl command -d=COM3 --name=battery --state=false
+false
 ```
 
-### JSON (--json flag)
+### JSON (`-o json`)
+
+Every response includes a mandatory `code` field (0 on success). Errors add an `error` field.
+
 ```
-$ taccl list --json
-[{"port":"COM3","serial":"ABC123"},{"port":"COM5","serial":"DEF456"}]
+$ taccl -o=json list
+{"code":0,"devices":[{"port":"COM3","serial":"ABC123"},{"port":"COM5","serial":"DEF456"}]}
 
-$ taccl info --device=COM3 --json
-{"name":"TAC-Device-1","firmware":"1.2.3","hardware":"TAC-Lite","hardwareVersion":"2.0","uuid":"550e8400-e29b-41d4-a716-446655440000","resetCount":5}
+$ taccl -d=COM3 -o=json info
+{"code":0,"name":"TAC-Device-1","firmware":"1.2.3","hardware":"TAC-Lite","hardwareVersion":"2.0","uuid":"550e8400-e29b-41d4-a716-446655440000"}
 
-$ taccl battery --device=COM3 --json
-{"state":true}
-```
+$ taccl -d=COM3 -o=json commands
+{"code":0,"commands":["battery","usb0","usb1","pkey","volup","voldn","pedl","sedl"]}
 
----
+$ taccl -d=COM3 -o=json quick-commands
+{"code":0,"quickCommands":["bootToEDL","bootToFastboot"]}
 
-## Exit Codes
-```
-0   Success
-1   General error
-2   Device not found
-3   Invalid arguments / usage error
-4   TAC command failed
-5   Initialization failed
+$ taccl -d=COM3 -o=json command --name=battery
+{"code":0,"command":"battery","state":true}
+
+$ taccl -d=COM3 -o=json command --name=battery --state=false
+{"code":0,"command":"battery","state":false}
+
+$ taccl -d=COM3 -o=json var --name=edl
+{"code":0,"variable":"edl","value":"1200"}
+
+$ taccl -d=COM3 -o=json var --name=edl --value=1200
+{"code":0,"variable":"edl","value":"1200"}
+
+$ taccl -d=COM99 -o=json info
+{"code":2,"error":"device 'COM99' not found"}
 ```
 
 ---
 
 ## Error Handling
-- Errors to stderr
+
+- Errors written to stderr
 - Exit with appropriate code
-- JSON errors when `-j` flag is set
+- JSON errors follow the same schema when `-o json` is set
 
 ```
-$ taccl info --device=COM99
+$ taccl info -d=COM99
 taccl: device 'COM99' not found
 $ echo $?
 2
 
-$ taccl battery --device=COM3 --state=invalid
-taccl: invalid value 'invalid' for --state, expected 'on' or 'off'
+$ taccl command -d=COM3 --name=battery --state=invalid
+taccl: invalid value 'invalid' for --state, expected 'true', 'false', '1', or '0'
 $ echo $?
 3
 ```
@@ -262,10 +243,10 @@ $ echo $?
    cmake --build build
    ```
 2. `taccl --help` - verify help text
-3. `taccl --version` - verify version output
+3. `taccl version` - verify version output
 4. `taccl list` - enumerate devices
-5. `taccl info --device=<port>` - query device info
-6. `taccl battery --device=<port>` - query state
-7. `taccl battery --device=<port> --state=on` - change state
-8. `taccl list --json | jq .` - verify JSON output
-9. `TACCL_DEVICE=<port> taccl battery` - verify env var fallback
+5. `taccl info -d=<port>` - query device info
+6. `taccl command -d=<port> --name=battery` - query state
+7. `taccl command -d=<port> --name=battery --state=true` - change state
+8. `taccl list -o=json | jq .` - verify JSON output
+9. `TACCL_DEVICE=<port> taccl command --name=battery` - verify env var fallback
